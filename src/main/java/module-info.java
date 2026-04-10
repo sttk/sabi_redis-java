@@ -14,6 +14,7 @@
 module com.github.sttk.sabi_redis {
   exports com.github.sttk.sabi_redis;
 
-  requires transitive com.github.sttk.errs;
   requires transitive com.github.sttk.sabi;
+  requires transitive com.github.sttk.errs;
+  requires transitive lettuce.core;
 }
