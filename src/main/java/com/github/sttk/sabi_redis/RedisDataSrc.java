@@ -197,6 +197,7 @@ public class RedisDataSrc implements DataSrc {
       }
       try (var conn = client.connect()) {
       } catch (Exception e) {
+        client.shutdown();
         var redisURL = RedisURI.create(this.uri);
         throw new Err(new FailToConnectToRedis(this.cr, redisURL), e);
       }
@@ -224,6 +225,7 @@ public class RedisDataSrc implements DataSrc {
       }
       try (var conn = client.connect()) {
       } catch (Exception e) {
+        client.shutdown();
         throw new Err(new FailToConnectToRedis(this.cr, this.redisURI), e);
       }
       return client;
