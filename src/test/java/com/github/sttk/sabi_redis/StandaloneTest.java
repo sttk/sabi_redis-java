@@ -5,15 +5,12 @@ import static org.assertj.core.api.Assertions.fail;
 
 import com.github.sttk.errs.Err;
 import com.github.sttk.sabi.DataHub;
-import com.github.sttk.sabi.AsyncGroup;
-import java.net.URI;
-import java.net.URISyntaxException;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Nested;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.resource.DefaultClientResources;
-import io.lettuce.core.resource.SocketAddressResolver;
-import io.lettuce.core.resource.DnsResolver;
+import java.net.URI;
+import java.net.URISyntaxException;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 public class StandaloneTest {
   private StandaloneTest() {}
@@ -71,7 +68,8 @@ public class StandaloneTest {
             case RedisDataSrc.FailToCreateClientFromUriString reason2 -> {
               assertThat(reason2.uri()).isEqualTo("redis://127.0.0.1:9999/0");
               assertThat(err2.getCause().toString())
-                  .isEqualTo("io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
+                  .isEqualTo(
+                      "io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
             }
             default -> fail(err);
           }
@@ -146,7 +144,8 @@ public class StandaloneTest {
             case RedisDataSrc.FailToCreateClientFromURI reason2 -> {
               assertThat(reason2.uri().toString()).isEqualTo("redis://127.0.0.1:9999/0");
               assertThat(err2.getCause().toString())
-                  .isEqualTo("io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
+                  .isEqualTo(
+                      "io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
             }
             default -> fail(err);
           }
@@ -183,7 +182,8 @@ public class StandaloneTest {
             case RedisDataSrc.FailToCreateClientFromRedisURI reason2 -> {
               assertThat(reason2.redisURI().toString()).isEqualTo("redis://127.0.0.1:9999/1");
               assertThat(err2.getCause().toString())
-                  .isEqualTo("io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
+                  .isEqualTo(
+                      "io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
             }
             default -> fail(err);
           }
@@ -249,7 +249,8 @@ public class StandaloneTest {
             case RedisDataSrc.FailToCreateClientFromClientResourcesAndUriString reason2 -> {
               assertThat(reason2.uri()).isEqualTo("redis://127.0.0.1:9999/0");
               assertThat(err2.getCause().toString())
-                  .isEqualTo("io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
+                  .isEqualTo(
+                      "io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
             }
             default -> fail(err);
           }
@@ -327,7 +328,8 @@ public class StandaloneTest {
             case RedisDataSrc.FailToCreateClientFromClientResourcesAndURI reason2 -> {
               assertThat(reason2.uri().toString()).isEqualTo("redis://127.0.0.1:9999/0");
               assertThat(err2.getCause().toString())
-                  .isEqualTo("io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
+                  .isEqualTo(
+                      "io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
             }
             default -> fail(err);
           }
@@ -366,7 +368,8 @@ public class StandaloneTest {
             case RedisDataSrc.FailToCreateClientFromClientResourcesAndRedisURI reason2 -> {
               assertThat(reason2.redisURI().toString()).isEqualTo("redis://127.0.0.1:9999/1");
               assertThat(err2.getCause().toString())
-                  .isEqualTo("io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
+                  .isEqualTo(
+                      "io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
             }
             default -> fail(err);
           }
@@ -383,9 +386,10 @@ public class StandaloneTest {
       var conn = new RedisDataConn(null);
       conn.rollback(null);
 
-      conn.addPreCommit(_conn -> {
-        throw new Err("bad");
-      });
+      conn.addPreCommit(
+          _conn -> {
+            throw new Err("bad");
+          });
       try {
         conn.preCommit(null);
         fail();
@@ -393,14 +397,16 @@ public class StandaloneTest {
         assertThat(err.getReason()).isEqualTo("bad");
       }
 
-      conn.addPostCommit(_conn -> {
-        throw new Err("bad");
-      });
+      conn.addPostCommit(
+          _conn -> {
+            throw new Err("bad");
+          });
       conn.postCommit(null);
 
-      conn.addForceBack(_conn -> {
-        throw new Err("bad");
-      });
+      conn.addForceBack(
+          _conn -> {
+            throw new Err("bad");
+          });
       conn.forceBack(null);
     }
 
