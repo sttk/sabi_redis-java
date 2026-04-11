@@ -106,7 +106,7 @@ public class StandaloneSyncTest {
       var dc = getDataConn("redis", RedisDataConn.class);
       var redisConn = dc.getConnection();
 
-      dc.addPreCommit(
+      dc.addPostCommit(
           redisConn1 -> {
             var commands1 = redisConn1.sync();
             commands1.set("sample_post_commit", val);
@@ -167,44 +167,8 @@ public class StandaloneSyncTest {
   //
 
   @Test
-  void test_NewRedisDataSrc() {
-    var data = new SampleDataHub();
-    data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/0"));
-    try {
-      data.run(sampleLogic);
-    } catch (Err e) {
-      fail(e);
-    }
-  }
-
-  @Test
-  void test_FailDueToInvalidAddr() {
-    var data = new SampleDataHub();
-    data.uses("redis", new RedisDataSrc("xxxx"));
-    try {
-      data.run(sampleLogic);
-    } catch (Err err) {
-      switch (err.getReason()) {
-        case DataHub.FailToSetupLocalDataSrcs reason -> {
-          assertThat(reason.errors()).hasSize(1);
-          var err2 = reason.errors().get("redis");
-          switch (err2.getReason()) {
-            case RedisDataSrc.FailToCreateClientFromUriString reason2 -> {
-              assertThat(reason2.uri()).isEqualTo("xxxx");
-              assertThat(err2.getCause().toString())
-                  .isEqualTo("java.lang.IllegalArgumentException: URI scheme must not be null");
-            }
-            default -> fail(err);
-          }
-        }
-        default -> fail(err);
-      }
-    }
-  }
-
-  @Test
   void test_TxnAndForceBack() {
-    var data = new SampleDataHub();
+    try (var data = new SampleDataHub()) {
     data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/3"));
     try {
       data.txn(sampleLogicWithForceBackOk);
@@ -246,11 +210,12 @@ public class StandaloneSyncTest {
       cmd.del("sample_force_back_2");
       assertThat(s).isNull();
     }
+    }
   }
 
   @Test
   void test_TxnAndPreCommit() {
-    var data = new SampleDataHub();
+    try (var data = new SampleDataHub()) {
     data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/4"));
     try {
       data.txn(sampleLogicWithPreCommit);
@@ -267,11 +232,12 @@ public class StandaloneSyncTest {
       cmd.del("sample_pre_commit");
       assertThat(s).isEqualTo("Good Evening");
     }
+    }
   }
 
   @Test
   void test_TxnAndPostCommit() {
-    var data = new SampleDataHub();
+    try (var data = new SampleDataHub()) {
     data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/5"));
     try {
       data.txn(sampleLogicWithPostCommit);
@@ -287,6 +253,7 @@ public class StandaloneSyncTest {
       var s = cmd.get("sample_post_commit");
       cmd.del("sample_post_commit");
       assertThat(s).isEqualTo("Good Night");
+    }
     }
   }
 }

@@ -14,19 +14,19 @@ import java.util.List;
 /**
  * The DataConn implementation for Redis in standalone configuration.
  *
- * <p>This class manages a connection to a Redis server and provides ways to register handlers
- * that are executed at certain points in the connection's lifecycle.
+ * <p>This class manages a connection to a Redis server and provides ways to register handlers that
+ * are executed at certain points in the connection's lifecycle.
  */
 public class RedisDataConn implements DataConn {
 
-  /// Fields
+  // Fields
 
   private final StatefulRedisConnection<String, String> connection;
   private final List<ConnectionHandler> preCommits = new ArrayList<>();
   private final List<ConnectionHandler> postCommits = new ArrayList<>();
   private final List<ConnectionHandler> forceBacks = new ArrayList<>();
 
-  /// Constructors
+  // Constructors
 
   /**
    * Constructs a new RedisDataConn with the given Redis connection.
@@ -37,7 +37,7 @@ public class RedisDataConn implements DataConn {
     this.connection = connection;
   }
 
-  /// Methods
+  // Methods
 
   /**
    * Returns the Redis connection.
@@ -124,8 +124,8 @@ public class RedisDataConn implements DataConn {
   }
 
   /**
-   * Rolls back the connection. (Currently does nothing as Redis doesn't have a direct rollback for a
-   * simple connection)
+   * Rolls back the connection. (Currently does nothing as Redis doesn't have a direct rollback for
+   * a simple connection)
    *
    * @param ag an asynchronous group.
    */
@@ -147,9 +147,7 @@ public class RedisDataConn implements DataConn {
     }
   }
 
-  /**
-   * Closes the connection.
-   */
+  /** Closes the connection. */
   @Override
   public void close() {
     this.connection.close();
