@@ -169,91 +169,91 @@ public class StandaloneSyncTest {
   @Test
   void test_TxnAndForceBack() {
     try (var data = new SampleDataHub()) {
-    data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/3"));
-    try {
-      data.txn(sampleLogicWithForceBackOk);
-    } catch (Err err) {
-      fail(err);
-    }
+      data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/3"));
+      try {
+        data.txn(sampleLogicWithForceBackOk);
+      } catch (Err err) {
+        fail(err);
+      }
 
-    {
-      var client = RedisClient.create("redis://127.0.0.1:6379/3");
-      var conn = client.connect();
-      var cmd = conn.sync();
+      {
+        var client = RedisClient.create("redis://127.0.0.1:6379/3");
+        var conn = client.connect();
+        var cmd = conn.sync();
 
-      var s = cmd.get("sample_force_back");
-      cmd.del("sample_force_back");
-      assertThat(s).isEqualTo("Good Morning");
+        var s = cmd.get("sample_force_back");
+        cmd.del("sample_force_back");
+        assertThat(s).isEqualTo("Good Morning");
 
-      s = cmd.get("sample_force_back_2");
-      cmd.del("sample_force_back_2");
-      assertThat(s).isEqualTo("Good Morning");
-    }
+        s = cmd.get("sample_force_back_2");
+        cmd.del("sample_force_back_2");
+        assertThat(s).isEqualTo("Good Morning");
+      }
 
-    try {
-      data.txn(sampleLogicWithForceBackErr);
-      fail();
-    } catch (Err err) {
-      assertThat(err.getReason()).isEqualTo("XXX");
-    }
+      try {
+        data.txn(sampleLogicWithForceBackErr);
+        fail();
+      } catch (Err err) {
+        assertThat(err.getReason()).isEqualTo("XXX");
+      }
 
-    {
-      var client = RedisClient.create("redis://127.0.0.1:6379/3");
-      var conn = client.connect();
-      var cmd = conn.sync();
+      {
+        var client = RedisClient.create("redis://127.0.0.1:6379/3");
+        var conn = client.connect();
+        var cmd = conn.sync();
 
-      var s = cmd.get("sample_force_back");
-      cmd.del("sample_force_back");
-      assertThat(s).isNull();
+        var s = cmd.get("sample_force_back");
+        cmd.del("sample_force_back");
+        assertThat(s).isNull();
 
-      s = cmd.get("sample_force_back_2");
-      cmd.del("sample_force_back_2");
-      assertThat(s).isNull();
-    }
+        s = cmd.get("sample_force_back_2");
+        cmd.del("sample_force_back_2");
+        assertThat(s).isNull();
+      }
     }
   }
 
   @Test
   void test_TxnAndPreCommit() {
     try (var data = new SampleDataHub()) {
-    data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/4"));
-    try {
-      data.txn(sampleLogicWithPreCommit);
-    } catch (Err err) {
-      fail(err);
-    }
+      data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/4"));
+      try {
+        data.txn(sampleLogicWithPreCommit);
+      } catch (Err err) {
+        fail(err);
+      }
 
-    {
-      var client = RedisClient.create("redis://127.0.0.1:6379/4");
-      var conn = client.connect();
-      var cmd = conn.sync();
+      {
+        var client = RedisClient.create("redis://127.0.0.1:6379/4");
+        var conn = client.connect();
+        var cmd = conn.sync();
 
-      var s = cmd.get("sample_pre_commit");
-      cmd.del("sample_pre_commit");
-      assertThat(s).isEqualTo("Good Evening");
-    }
+        var s = cmd.get("sample_pre_commit");
+        cmd.del("sample_pre_commit");
+        assertThat(s).isEqualTo("Good Evening");
+      }
     }
   }
 
   @Test
   void test_TxnAndPostCommit() {
     try (var data = new SampleDataHub()) {
-    data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/5"));
-    try {
-      data.txn(sampleLogicWithPostCommit);
-    } catch (Err err) {
-      fail(err);
-    }
+      data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/5"));
+      try {
+        data.txn(sampleLogicWithPostCommit);
+      } catch (Err err) {
+        fail(err);
+      }
 
-    {
-      var client = RedisClient.create("redis://127.0.0.1:6379/5");
-      var conn = client.connect();
-      var cmd = conn.sync();
+      {
+        var client = RedisClient.create("redis://127.0.0.1:6379/5");
+        var conn = client.connect();
+        var cmd = conn.sync();
 
-      var s = cmd.get("sample_post_commit");
-      cmd.del("sample_post_commit");
-      assertThat(s).isEqualTo("Good Night");
-    }
+        var s = cmd.get("sample_post_commit");
+        cmd.del("sample_post_commit");
+        assertThat(s).isEqualTo("Good Night");
+      }
     }
   }
 }
