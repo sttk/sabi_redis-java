@@ -180,43 +180,34 @@
 
   <profiles>
     <profile>
-      <id>native</id>
+      <id>nativ-build-option-jdk21</id>
       <activation>
-        <jdk>[21, 24]</jdk>
+        <jdk>21</jdk>
       </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.graalvm.buildtools</groupId>
-            <artifactId>native-maven-plugin</artifactId>
-            <version>1.0.0</version>
-            <extensions>true</extensions>
-            <executions>
-              <execution>
-                <id>native test</id>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <phase>test</phase>
-              </execution>
-            </executions>
-            <configuration>
-              <fallback>false</fallback>
-              <!-- For changing environment variables in unit tests. -->
-              <buildArgs>
-                <buildArg>-J--add-opens=java.base/java.lang=ALL-UNNAMED</buildArg>
-                <buildArg>--initialize-at-build-time=org.junit.jupiter.engine.discovery.MethodSegmentResolver</buildArg>
-              </buildArgs>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
+      <properties>
+        <buildArg>-J--add-opens=java.base/java.lang=ALL-UNNAMED --initialize-at-build-time=org.junit.jupiter.engine.discovery.MethodSegmentResolver</buildArg>
+      </properties>
     </profile>
     <profile>
-      <id>native-jdk25</id>
+      <id>nativ-build-option-jdk23-to-24</id>
+      <activation>
+        <jdk>[23,25)</jdk>
+      </activation>
+      <properties>
+        <buildArg>-J--add-opens=java.base/java.lang=ALL-UNNAMED</buildArg>
+      </properties>
+    </profile>
+    <profile>
+      <id>nativ-build-option-jdk25</id>
       <activation>
         <jdk>25</jdk>
       </activation>
+      <properties>
+        <buildArg>-J--add-opens=java.base/java.lang=ALL-UNNAMED -H:+SharedArenaSupport</buildArg>
+      </properties>
+    </profile>
+    <profile>
+      <id>native</id>
       <build>
         <plugins>
           <plugin>
@@ -235,11 +226,8 @@
             </executions>
             <configuration>
               <fallback>false</fallback>
-              <!-- For changing environment variables in unit tests. -->
               <buildArgs>
-                <buildArg>-J--add-opens=java.base/java.lang=ALL-UNNAMED</buildArg>
-                <buildArg>--initialize-at-build-time=org.junit.jupiter.engine.discovery.MethodSegmentResolver</buildArg>
-                <buildArg>-H:+SharedArenaSupport</buildArg>
+                <buildArg>${buildArg}</buildArg>
               </buildArgs>
             </configuration>
           </plugin>
