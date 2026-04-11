@@ -21,16 +21,12 @@ import java.net.URI;
  */
 public class RedisDataSrc implements DataSrc {
 
-  /// Error reasons
+  // Error reasons
 
-  /**
-   * The error reason that indicates the {@link RedisDataSrc} is not setup yet.
-   */
+  /** The error reason that indicates the {@link RedisDataSrc} is not setup yet. */
   public record NotSetupYet() {}
 
-  /**
-   * The error reason that indicates the {@link RedisDataSrc} is already setup.
-   */
+  /** The error reason that indicates the {@link RedisDataSrc} is already setup. */
   public record AlreadySetup() {}
 
   /**
@@ -41,7 +37,8 @@ public class RedisDataSrc implements DataSrc {
   public record FailToCreateClientFromUriString(String uri) {}
 
   /**
-   * The error reason that indicates failing to create a {@link RedisClient} from a {@link URI} object.
+   * The error reason that indicates failing to create a {@link RedisClient} from a {@link URI}
+   * object.
    *
    * @param uri a URI object.
    */
@@ -54,14 +51,6 @@ public class RedisDataSrc implements DataSrc {
    * @param redisURI a RedisURI object.
    */
   public record FailToCreateClientFromRedisURI(RedisURI redisURI) {}
-
-  /**
-   * The error reason that indicates failing to create a {@link RedisClient} from a {@link
-   * ClientResources} object.
-   *
-   * @param clientResources a ClientResources object.
-   */
-  public record FailToCreateClientFromClientResources(ClientResources clientResources) {}
 
   /**
    * The error reason that indicates failing to create a {@link RedisClient} from a {@link
@@ -93,12 +82,12 @@ public class RedisDataSrc implements DataSrc {
   public record FailToCreateClientFromClientResourcesAndRedisURI(
       ClientResources clientResources, RedisURI redisURI) {}
 
-  /// Fields
+  // Fields
 
   private RedisClientFactory redisClientFactory;
   private RedisClient redisClient;
 
-  /// Constructors
+  // Constructors
 
   /**
    * Constructs a new RedisDataSrc with the given URI string.
@@ -125,15 +114,6 @@ public class RedisDataSrc implements DataSrc {
    */
   public RedisDataSrc(RedisURI redisURI) {
     this.redisClientFactory = new RedisClientFactoryByRedisURI(redisURI);
-  }
-
-  /**
-   * Constructs a new RedisDataSrc with the given {@link ClientResources} object.
-   *
-   * @param cr a ClientResources object.
-   */
-  public RedisDataSrc(ClientResources cr) {
-    this.redisClientFactory = new RedisClientFactoryByClientResources(cr);
   }
 
   /**
@@ -168,7 +148,7 @@ public class RedisDataSrc implements DataSrc {
     this.redisClientFactory = new RedisClientFactoryByClientResourcesAndRedisURI(cr, redisURI);
   }
 
-  /// Methods
+  // Methods
 
   /**
    * Sets up this data source.
@@ -188,9 +168,7 @@ public class RedisDataSrc implements DataSrc {
     this.redisClient = factory.create();
   }
 
-  /**
-   * Closes this data source and shuts down the {@link RedisClient}.
-   */
+  /** Closes this data source and shuts down the {@link RedisClient}. */
   @Override
   public void close() {
     if (this.redisClient != null) {
@@ -228,9 +206,12 @@ public class RedisDataSrc implements DataSrc {
     }
 
     @Override
+    @SuppressWarnings("try")
     public RedisClient create() throws Err {
       try {
-        return RedisClient.create(this.uri);
+        var client = RedisClient.create(this.uri);
+        try (var conn = client.connect()) {}
+        return client;
       } catch (Exception e) {
         throw new Err(new FailToCreateClientFromUriString(this.uri), e);
       }
@@ -245,9 +226,12 @@ public class RedisDataSrc implements DataSrc {
     }
 
     @Override
+    @SuppressWarnings("try")
     public RedisClient create() throws Err {
       try {
-        return RedisClient.create(this.uri.toString());
+        var client = RedisClient.create(this.uri.toString());
+        try (var conn = client.connect()) {}
+        return client;
       } catch (Exception e) {
         throw new Err(new FailToCreateClientFromURI(this.uri), e);
       }
@@ -262,28 +246,14 @@ public class RedisDataSrc implements DataSrc {
     }
 
     @Override
+    @SuppressWarnings("try")
     public RedisClient create() throws Err {
       try {
-        return RedisClient.create(this.redisURI);
+        var client = RedisClient.create(this.redisURI);
+        try (var conn = client.connect()) {}
+        return client;
       } catch (Exception e) {
         throw new Err(new FailToCreateClientFromRedisURI(this.redisURI), e);
-      }
-    }
-  }
-
-  private class RedisClientFactoryByClientResources implements RedisClientFactory {
-    final ClientResources clientResources;
-
-    RedisClientFactoryByClientResources(ClientResources cr) {
-      this.clientResources = cr;
-    }
-
-    @Override
-    public RedisClient create() throws Err {
-      try {
-        return RedisClient.create(this.clientResources);
-      } catch (Exception e) {
-        throw new Err(new FailToCreateClientFromClientResources(this.clientResources), e);
       }
     }
   }
@@ -298,9 +268,12 @@ public class RedisDataSrc implements DataSrc {
     }
 
     @Override
+    @SuppressWarnings("try")
     public RedisClient create() throws Err {
       try {
-        return RedisClient.create(this.clientResources, this.uri);
+        var client = RedisClient.create(this.clientResources, this.uri);
+        try (var conn = client.connect()) {}
+        return client;
       } catch (Exception e) {
         throw new Err(
             new FailToCreateClientFromClientResourcesAndUriString(this.clientResources, this.uri),
@@ -319,9 +292,12 @@ public class RedisDataSrc implements DataSrc {
     }
 
     @Override
+    @SuppressWarnings("try")
     public RedisClient create() throws Err {
       try {
-        return RedisClient.create(this.clientResources, this.uri.toString());
+        var client = RedisClient.create(this.clientResources, this.uri.toString());
+        try (var conn = client.connect()) {}
+        return client;
       } catch (Exception e) {
         throw new Err(
             new FailToCreateClientFromClientResourcesAndURI(this.clientResources, this.uri), e);
@@ -339,9 +315,12 @@ public class RedisDataSrc implements DataSrc {
     }
 
     @Override
+    @SuppressWarnings("try")
     public RedisClient create() throws Err {
       try {
-        return RedisClient.create(this.clientResources, this.redisURI);
+        var client = RedisClient.create(this.clientResources, this.redisURI);
+        try (var conn = client.connect()) {}
+        return client;
       } catch (Exception e) {
         throw new Err(
             new FailToCreateClientFromClientResourcesAndRedisURI(
