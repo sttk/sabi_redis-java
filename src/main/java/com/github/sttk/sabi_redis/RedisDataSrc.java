@@ -71,8 +71,7 @@ public class RedisDataSrc implements DataSrc {
    * @param uri a URI string.
    */
   public RedisDataSrc(String uri) {
-    var cr = DefaultClientResources.create();
-    this.redisClientFactory = new RedisClientFactoryWithUriString(cr, uri);
+    this.redisClientFactory = new RedisClientFactoryWithUriString(null, uri);
   }
 
   /**
@@ -81,8 +80,7 @@ public class RedisDataSrc implements DataSrc {
    * @param uri a URI object.
    */
   public RedisDataSrc(URI uri) {
-    var cr = DefaultClientResources.create();
-    this.redisClientFactory = new RedisClientFactoryWithUriString(cr, uri.toString());
+    this.redisClientFactory = new RedisClientFactoryWithUriString(null, uri.toString());
   }
 
   /**
@@ -91,8 +89,7 @@ public class RedisDataSrc implements DataSrc {
    * @param redisURI a RedisURI object.
    */
   public RedisDataSrc(RedisURI redisURI) {
-    var cr = DefaultClientResources.create();
-    this.redisClientFactory = new RedisClientFactoryWithRedisURI(cr, redisURI);
+    this.redisClientFactory = new RedisClientFactoryWithRedisURI(null, redisURI);
   }
 
   /**
@@ -191,7 +188,11 @@ public class RedisDataSrc implements DataSrc {
     public RedisClient create() throws Err {
       RedisClient client = null;
       try {
-        client = RedisClient.create(this.cr, this.uri);
+        if (this.cr == null) {
+          client = RedisClient.create(this.uri);
+        } else {
+          client = RedisClient.create(this.cr, this.uri);
+        }
       } catch (Exception e) {
         throw new Err(new FailToCreateClientWithUriString(this.cr, this.uri), e);
       }
@@ -219,7 +220,11 @@ public class RedisDataSrc implements DataSrc {
     public RedisClient create() throws Err {
       RedisClient client = null;
       try {
-        client = RedisClient.create(this.cr, this.redisURI);
+        if (this.cr == null) {
+          client = RedisClient.create(this.redisURI);
+        } else {
+          client = RedisClient.create(this.cr, this.redisURI);
+        }
       } catch (Exception e) {
         throw new Err(new FailToCreateClientWithRedisURI(this.cr, this.redisURI), e);
       }
