@@ -9,7 +9,10 @@
  * Provides classes to connect and operate Redis server for Sabi framework.
  *
  * <p>This package contains the {@code DataSrc} and {@code DataConn} classes which required to
- * connect to and operate Redis server in various configurations.
+ * connect to and operate Redis server in standalone configuration.
+ *
+ * <p>The sub-package {@code sentinel} contains the classes to connect and operate Redis server in
+ * sentinel configuration.
  *
  * @version 0.1
  */
