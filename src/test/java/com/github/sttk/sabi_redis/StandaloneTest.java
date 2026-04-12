@@ -17,9 +17,8 @@ public class StandaloneTest {
 
   @Test
   void test_NewRedisDataSrcWithUriString() {
-    var data = new DataHub();
-    data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/0"));
-    try {
+    try (var data = new DataHub()) {
+      data.uses("redis", new RedisDataSrc("redis://127.0.0.1:6379/0"));
       data.run(d -> {});
     } catch (Err e) {
       fail(e);
@@ -28,9 +27,8 @@ public class StandaloneTest {
 
   @Test
   void test_NewRedisDataSrcWithUriStringButInvalidAddr() {
-    var data = new DataHub();
-    data.uses("redis", new RedisDataSrc("xxxx"));
-    try {
+    try (var data = new DataHub()) {
+      data.uses("redis", new RedisDataSrc("xxxx"));
       data.run(d -> {});
       fail();
     } catch (Err err) {
@@ -41,7 +39,7 @@ public class StandaloneTest {
           switch (err2.getReason()) {
             case RedisDataSrc.FailToCreateClientWithUriString reason2 -> {
               assertThat(reason2.uri()).isEqualTo("xxxx");
-              assertThat(reason2.clientResources()).isNotNull();
+              assertThat(reason2.clientResources()).isNull();
               assertThat(err2.getCause().toString())
                   .isEqualTo("java.lang.IllegalArgumentException: URI scheme must not be null");
             }
@@ -55,9 +53,8 @@ public class StandaloneTest {
 
   @Test
   void test_NewRedisDataSrcWithUriStringButNotFoundAddr() {
-    var data = new DataHub();
-    data.uses("redis", new RedisDataSrc("redis://127.0.0.1:9999/0"));
-    try {
+    try (var data = new DataHub()) {
+      data.uses("redis", new RedisDataSrc("redis://127.0.0.1:9999/0"));
       data.run(d -> {});
       fail();
     } catch (Err err) {
@@ -70,7 +67,7 @@ public class StandaloneTest {
               assertThat(reason2.redisURI().getHost()).isEqualTo("127.0.0.1");
               assertThat(reason2.redisURI().getPort()).isEqualTo(9999);
               assertThat(reason2.redisURI().getDatabase()).isEqualTo(0);
-              assertThat(reason2.clientResources()).isNotNull();
+              assertThat(reason2.clientResources()).isNull();
               assertThat(err2.getCause().toString())
                   .isEqualTo(
                       "io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
@@ -85,28 +82,20 @@ public class StandaloneTest {
 
   @Test
   void test_NewRedisDataSrcWithURI() {
-    var data = new DataHub();
-    try {
+    try (var data = new DataHub()) {
       data.uses("redis", new RedisDataSrc(new URI("redis://127.0.0.1:6379/0")));
-    } catch (URISyntaxException e) {
-      fail(e);
-    }
-    try {
       data.run(d -> {});
     } catch (Err e) {
+      fail(e);
+    } catch (URISyntaxException e) {
       fail(e);
     }
   }
 
   @Test
   void test_NewRedisDataSrcWithURIButInvalidAddr() {
-    var data = new DataHub();
-    try {
+    try (var data = new DataHub()) {
       data.uses("redis", new RedisDataSrc(new URI("xxxx")));
-    } catch (URISyntaxException e) {
-      fail(e);
-    }
-    try {
       data.run(d -> {});
       fail();
     } catch (Err err) {
@@ -117,7 +106,7 @@ public class StandaloneTest {
           switch (err2.getReason()) {
             case RedisDataSrc.FailToCreateClientWithUriString reason2 -> {
               assertThat(reason2.uri().toString()).isEqualTo("xxxx");
-              assertThat(reason2.clientResources()).isNotNull();
+              assertThat(reason2.clientResources()).isNull();
               assertThat(err2.getCause().toString())
                   .isEqualTo("java.lang.IllegalArgumentException: URI scheme must not be null");
             }
@@ -126,18 +115,15 @@ public class StandaloneTest {
         }
         default -> fail(err);
       }
+    } catch (URISyntaxException e) {
+      fail(e);
     }
   }
 
   @Test
   void test_NewRedisDataSrcWithURIButNotFoundAddr() {
-    var data = new DataHub();
-    try {
+    try (var data = new DataHub()) {
       data.uses("redis", new RedisDataSrc(new URI("redis://127.0.0.1:9999/0")));
-    } catch (URISyntaxException e) {
-      fail(e);
-    }
-    try {
       data.run(d -> {});
       fail();
     } catch (Err err) {
@@ -150,7 +136,7 @@ public class StandaloneTest {
               assertThat(reason2.redisURI().getHost()).isEqualTo("127.0.0.1");
               assertThat(reason2.redisURI().getPort()).isEqualTo(9999);
               assertThat(reason2.redisURI().getDatabase()).isEqualTo(0);
-              assertThat(reason2.clientResources()).isNotNull();
+              assertThat(reason2.clientResources()).isNull();
               assertThat(err2.getCause().toString())
                   .isEqualTo(
                       "io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
@@ -160,14 +146,15 @@ public class StandaloneTest {
         }
         default -> fail(err);
       }
+    } catch (URISyntaxException e) {
+      fail(e);
     }
   }
 
   @Test
   void test_NewRedisDataSrcWithRedisURI() {
-    var data = new DataHub();
-    data.uses("redis", new RedisDataSrc(RedisURI.create("redis://127.0.0.1:6379/0")));
-    try {
+    try (var data = new DataHub()) {
+      data.uses("redis", new RedisDataSrc(RedisURI.create("redis://127.0.0.1:6379/0")));
       data.run(d -> {});
     } catch (Err e) {
       fail(e);
@@ -176,9 +163,8 @@ public class StandaloneTest {
 
   @Test
   void test_NewRedisDataSrcWithRedisURIButInvalidAddr() {
-    var data = new DataHub();
-    data.uses("redis", new RedisDataSrc(RedisURI.create("redis://127.0.0.1:9999/1")));
-    try {
+    try (var data = new DataHub()) {
+      data.uses("redis", new RedisDataSrc(RedisURI.create("redis://127.0.0.1:9999/1")));
       data.run(d -> {});
       fail();
     } catch (Err err) {
@@ -191,7 +177,7 @@ public class StandaloneTest {
               assertThat(reason2.redisURI().getHost()).isEqualTo("127.0.0.1");
               assertThat(reason2.redisURI().getPort()).isEqualTo(9999);
               assertThat(reason2.redisURI().getDatabase()).isEqualTo(1);
-              assertThat(reason2.clientResources()).isNotNull();
+              assertThat(reason2.clientResources()).isNull();
               assertThat(err2.getCause().toString())
                   .isEqualTo(
                       "io.lettuce.core.RedisConnectionException: Unable to connect to 127.0.0.1/<unresolved>:9999");
@@ -207,21 +193,21 @@ public class StandaloneTest {
   @Test
   void test_NewRedisDataSrcWithClientResourcesAndUriString() {
     var cr = DefaultClientResources.create();
-    var data = new DataHub();
-    data.uses("redis", new RedisDataSrc(cr, "redis://127.0.0.1:6379/0"));
-    try {
+    try (var data = new DataHub()) {
+      data.uses("redis", new RedisDataSrc(cr, "redis://127.0.0.1:6379/0"));
       data.run(d -> {});
     } catch (Err e) {
       fail(e);
+    } finally {
+      cr.shutdown();
     }
   }
 
   @Test
   void test_NewRedisDataSrcWithClientResourcesAndUriStringButInvalidAddr() {
     var cr = DefaultClientResources.create();
-    var data = new DataHub();
-    data.uses("redis", new RedisDataSrc(cr, "xxxx"));
-    try {
+    try (var data = new DataHub()) {
+      data.uses("redis", new RedisDataSrc(cr, "xxxx"));
       data.run(d -> {});
       fail();
     } catch (Err err) {
@@ -241,15 +227,16 @@ public class StandaloneTest {
         }
         default -> fail(err);
       }
+    } finally {
+      cr.shutdown();
     }
   }
 
   @Test
   void test_NewRedisDataSrcWithClientResourcesAndUriStringButNotFoundAddr() {
     var cr = DefaultClientResources.create();
-    var data = new DataHub();
-    data.uses("redis", new RedisDataSrc(cr, "redis://127.0.0.1:9999/0"));
-    try {
+    try (var data = new DataHub()) {
+      data.uses("redis", new RedisDataSrc(cr, "redis://127.0.0.1:9999/0"));
       data.run(d -> {});
       fail();
     } catch (Err err) {
@@ -272,35 +259,31 @@ public class StandaloneTest {
         }
         default -> fail(err);
       }
+    } finally {
+      cr.shutdown();
     }
   }
 
   @Test
   void test_NewRedisDataSrcWithClientResourcesAndURI() {
     var cr = DefaultClientResources.create();
-    var data = new DataHub();
-    try {
+    try (var data = new DataHub()) {
       data.uses("redis", new RedisDataSrc(cr, new URI("redis://127.0.0.1:6379/0")));
-    } catch (URISyntaxException e) {
-      fail(e);
-    }
-    try {
       data.run(d -> {});
     } catch (Err e) {
       fail(e);
+    } catch (URISyntaxException e) {
+      fail(e);
+    } finally {
+      cr.shutdown();
     }
   }
 
   @Test
   void test_NewRedisDataSrcWithClientResourcesAndURIButInvalidAddr() {
     var cr = DefaultClientResources.create();
-    var data = new DataHub();
-    try {
+    try (var data = new DataHub()) {
       data.uses("redis", new RedisDataSrc(cr, new URI("xxxx")));
-    } catch (URISyntaxException e) {
-      fail(e);
-    }
-    try {
       data.run(d -> {});
       fail();
     } catch (Err err) {
@@ -320,19 +303,18 @@ public class StandaloneTest {
         }
         default -> fail(err);
       }
+    } catch (URISyntaxException e) {
+      fail(e);
+    } finally {
+      cr.shutdown();
     }
   }
 
   @Test
   void test_NewRedisDataSrcWithClientResourcesAndURIButNotFoundAddr() {
     var cr = DefaultClientResources.create();
-    var data = new DataHub();
-    try {
+    try (var data = new DataHub()) {
       data.uses("redis", new RedisDataSrc(cr, new URI("redis://127.0.0.1:9999/0")));
-    } catch (URISyntaxException e) {
-      fail(e);
-    }
-    try {
       data.run(d -> {});
       fail();
     } catch (Err err) {
@@ -355,27 +337,31 @@ public class StandaloneTest {
         }
         default -> fail(err);
       }
+    } catch (URISyntaxException e) {
+      fail(e);
+    } finally {
+      cr.shutdown();
     }
   }
 
   @Test
   void test_NewRedisDataSrcWithClientResourcesAndRedisURI() {
     var cr = DefaultClientResources.create();
-    var data = new DataHub();
-    data.uses("redis", new RedisDataSrc(cr, RedisURI.create("redis://127.0.0.1:6379/0")));
-    try {
+    try (var data = new DataHub()) {
+      data.uses("redis", new RedisDataSrc(cr, RedisURI.create("redis://127.0.0.1:6379/0")));
       data.run(d -> {});
     } catch (Err e) {
       fail(e);
+    } finally {
+      cr.shutdown();
     }
   }
 
   @Test
   void test_NewRedisDataSrcWithClientResourcesAndRedisURIButInvalidAddr() {
     var cr = DefaultClientResources.create();
-    var data = new DataHub();
-    data.uses("redis", new RedisDataSrc(cr, RedisURI.create("redis://127.0.0.1:9999/1")));
-    try {
+    try (var data = new DataHub()) {
+      data.uses("redis", new RedisDataSrc(cr, RedisURI.create("redis://127.0.0.1:9999/1")));
       data.run(d -> {});
       fail();
     } catch (Err err) {
@@ -398,6 +384,8 @@ public class StandaloneTest {
         }
         default -> fail(err);
       }
+    } finally {
+      cr.shutdown();
     }
   }
 
