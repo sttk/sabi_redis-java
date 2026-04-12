@@ -11,7 +11,6 @@ import com.github.sttk.sabi.DataSrc;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.resource.ClientResources;
-import io.lettuce.core.resource.DefaultClientResources;
 import java.net.URI;
 
 /**

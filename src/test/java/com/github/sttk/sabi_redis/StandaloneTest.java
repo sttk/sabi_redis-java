@@ -358,7 +358,7 @@ public class StandaloneTest {
   }
 
   @Test
-  void test_NewRedisDataSrcWithClientResourcesAndRedisURIButInvalidAddr() {
+  void test_NewRedisDataSrcWithClientResourcesAndRedisURIButNotFoundAddr() {
     var cr = DefaultClientResources.create();
     try (var data = new DataHub()) {
       data.uses("redis", new RedisDataSrc(cr, RedisURI.create("redis://127.0.0.1:9999/1")));

@@ -13,6 +13,7 @@
  */
 module com.github.sttk.sabi_redis {
   exports com.github.sttk.sabi_redis;
+  exports com.github.sttk.sabi_redis.sentinel;
 
   requires transitive com.github.sttk.sabi;
   requires transitive com.github.sttk.errs;
